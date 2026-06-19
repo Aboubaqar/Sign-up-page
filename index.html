@@ -356,7 +356,7 @@
         <div class="step-dot" id="dot3"></div>
       </div>
 
-      <form id="signupForm" novalidate>
+      <form id="signupForm" action="https://formspree.io/f/xqeordlp" method="POST" novalidate>
 
         <!-- STEP 1: Personal Info -->
         <div class="step-panel active" id="step1">
@@ -365,7 +365,7 @@
               <label for="firstname">First Name</label>
               <div class="input-icon-wrap">
                 <i class="fas fa-user field-icon"></i>
-                <input type="text" id="firstname" maxlength="20" placeholder="John" required />
+                <input type="text" id="firstname" name="firstname" maxlength="20" placeholder="John" required />
               </div>
               <div class="error-msg" id="err-firstname">First name is required</div>
             </div>
@@ -373,7 +373,7 @@
               <label for="lastname">Last Name</label>
               <div class="input-icon-wrap">
                 <i class="fas fa-user field-icon"></i>
-                <input type="text" id="lastname" maxlength="20" placeholder="Doe" required />
+                <input type="text" id="lastname" name="lastname" maxlength="20" placeholder="Doe" required />
               </div>
               <div class="error-msg" id="err-lastname">Last name is required</div>
             </div>
@@ -383,14 +383,14 @@
             <label for="middlename">Middle Name <span style="text-transform:none;color:var(--text-muted);font-weight:400;">(optional)</span></label>
             <div class="input-icon-wrap">
               <i class="fas fa-user field-icon"></i>
-              <input type="text" id="middlename" maxlength="20" placeholder="Optional" />
+              <input type="text" id="middlename" name="middlename" maxlength="20" placeholder="Optional" />
             </div>
           </div>
 
           <div class="field-group">
             <label for="course">Course</label>
             <div class="select-wrap">
-              <select id="course" required>
+              <select id="course" name="course" required>
                 <option value="" disabled selected>Select your course</option>
                 <option value="BCA">BCA — Bachelor of Computer Applications</option>
                 <option value="MBA">MBA — Master of Business Administration</option>
@@ -432,12 +432,12 @@
             <label for="phone">Phone Number</label>
             <div class="phone-row">
               <div class="field-group" style="margin-bottom:0;">
-                <input type="text" id="countrycode" value="+234" maxlength="4" style="padding-left:16px;text-align:center;" />
+                <input type="text" id="countrycode" name="countrycode" value="+234" maxlength="4" style="padding-left:16px;text-align:center;" />
               </div>
               <div class="field-group" style="margin-bottom:0;">
                 <div class="input-icon-wrap">
                   <i class="fas fa-phone field-icon"></i>
-                  <input type="tel" id="phone" maxlength="11" placeholder="801 234 5678" required />
+                  <input type="tel" id="phone" name="phone" maxlength="11" placeholder="801 234 5678" required />
                 </div>
               </div>
             </div>
@@ -448,7 +448,7 @@
             <label for="address">Address</label>
             <div class="input-icon-wrap">
               <i class="fas fa-location-dot field-icon" style="top:22px;"></i>
-              <textarea id="address" placeholder="Street, city, state" required></textarea>
+              <textarea id="address" name="address" placeholder="Street, city, state" required></textarea>
             </div>
             <div class="error-msg" id="err-address">Address is required</div>
           </div>
@@ -457,7 +457,7 @@
             <label for="email">Email Address</label>
             <div class="input-icon-wrap">
               <i class="fas fa-envelope field-icon"></i>
-              <input type="email" id="email" placeholder="you@example.com" required />
+              <input type="email" id="email" name="email" placeholder="you@example.com" required />
             </div>
             <div class="error-msg" id="err-email">Enter a valid email address</div>
           </div>
@@ -514,7 +514,7 @@
         <p>Your account has been created successfully.</p>
       </div>
 
-      <p class="signin-link">Already have an account? <a href="#">Sign in</a></p>
+      <p class="signin-link"><a href="https://aboubaqar.github.io/Aboubaqar-s-portfolio/"><i class="fas fa-arrow-left"></i> Back to Portfolio</a></p>
     </div>
   </div>
 
@@ -621,10 +621,38 @@
 
       if (!valid) return;
 
-      // Success
-      document.getElementById('signupForm').style.display = 'none';
-      document.querySelector('.steps').style.display = 'none';
-      document.getElementById('successPanel').classList.add('show');
+      const form = document.getElementById('signupForm');
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const originalBtnHtml = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+
+      const formData = new FormData(form);
+
+      fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: { 'Accept': 'application/json' }
+      })
+        .then(response => {
+          if (response.ok) {
+            form.style.display = 'none';
+            document.querySelector('.steps').style.display = 'none';
+            document.getElementById('successPanel').classList.add('show');
+          } else {
+            return response.json().then(data => {
+              const msg = (data && data.errors && data.errors.length)
+                ? data.errors.map(err => err.message).join(', ')
+                : 'Submission failed. Please try again.';
+              throw new Error(msg);
+            });
+          }
+        })
+        .catch((err) => {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalBtnHtml;
+          alert(err.message || 'Something went wrong submitting the form. Please check your connection and try again.');
+        });
     });
   </script>
 </body>

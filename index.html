@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Create Account — Sign Up</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    :root {
+      --gold: #d4af37;
+      --gold-dim: #a8892a;
+      --gold-glow: rgba(212,175,55,0.15);
+      --bg: #080810;
+      --surface: #12121e;
+      --surface2: #181826;
+      --border: rgba(212,175,55,0.16);
+      --text: #e8e8f4;
+      --text-muted: #8585a3;
+      --error: #ff6b6b;
+      --success: #4ade80;
+      --display: 'Syne', sans-serif;
+      --body: 'Inter', sans-serif;
+      --radius: 12px;
+      --transition: 0.25s ease;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--body);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 16px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Ambient background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 80% 10%, rgba(212,175,55,0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 60% at 10% 90%, rgba(100,80,200,0.07) 0%, transparent 60%);
+      z-index: 0;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 480px;
+    }
+
+    /* Header */
+    .form-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .form-header .eyebrow {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--gold);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .form-header h1 {
+      font-family: var(--display);
+      font-weight: 800;
+      font-size: clamp(1.6rem, 5vw, 2.2rem);
+      letter-spacing: -0.5px;
+    }
+    .form-header p {
+      color: var(--text-muted);
+      font-size: 0.92rem;
+      margin-top: 8px;
+    }
+
+    /* Card */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 36px 28px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+    }
+
+    /* Step indicator */
+    .steps {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 28px;
+    }
+    .step-dot {
+      width: 28px; height: 4px;
+      border-radius: 4px;
+      background: var(--border);
+      transition: background var(--transition), width var(--transition);
+    }
+    .step-dot.active { background: var(--gold); width: 40px; }
+    .step-dot.done { background: var(--gold-dim); }
+
+    /* Fieldsets per step */
+    .step-panel { display: none; }
+    .step-panel.active {
+      display: block;
+      animation: fadeSlide 0.4s ease;
+    }
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateX(12px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    .field-row { display: flex; gap: 12px; }
+    .field-row .field-group { flex: 1; }
+
+    .field-group {
+      margin-bottom: 18px;
+      position: relative;
+    }
+    .field-group label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      margin-bottom: 7px;
+    }
+
+    .input-icon-wrap { position: relative; }
+    .input-icon-wrap i.field-icon {
+      position: absolute;
+      left: 16px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      pointer-events: none;
+      transition: color var(--transition);
+    }
+
+    input[type=text], input[type=password], input[type=email],
+    input[type=number], input[type=tel], textarea, select {
+      width: 100%;
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 13px 16px 13px 42px;
+      color: var(--text);
+      font-family: var(--body);
+      font-size: 0.92rem;
+      outline: none;
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+    select { padding-left: 16px; appearance: none; cursor: pointer; }
+    textarea { padding-left: 16px; resize: none; min-height: 90px; }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--gold-dim);
+      box-shadow: 0 0 0 4px var(--gold-glow);
+    }
+    .input-icon-wrap input:focus + i.field-icon,
+    .input-icon-wrap:focus-within i.field-icon { color: var(--gold); }
+
+    input.error, textarea.error { border-color: var(--error); }
+    .error-msg {
+      font-size: 0.76rem;
+      color: var(--error);
+      margin-top: 5px;
+      display: none;
+    }
+    .error-msg.show { display: block; }
+
+    /* Select wrapper for custom arrow */
+    .select-wrap { position: relative; }
+    .select-wrap::after {
+      content: '\f078';
+      font-family: 'Font Awesome 6 Free';
+      font-weight: 900;
+      font-size: 0.7rem;
+      position: absolute;
+      right: 16px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    /* Gender radio cards */
+    .gender-group { display: flex; gap: 10px; }
+    .gender-option {
+      flex: 1;
+      position: relative;
+    }
+    .gender-option input { position: absolute; opacity: 0; }
+    .gender-option label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 8px;
+      font-size: 0.84rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-transform: none;
+      letter-spacing: 0;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .gender-option input:checked + label {
+      border-color: var(--gold);
+      background: var(--gold-glow);
+      color: var(--gold);
+    }
+
+    /* Phone row */
+    .phone-row { display: flex; gap: 10px; }
+    .phone-row .field-group:first-child { flex: 0 0 90px; }
+    .phone-row .field-group:last-child { flex: 1; }
+
+    /* Password strength meter */
+    .strength-meter {
+      height: 4px;
+      border-radius: 4px;
+      background: var(--border);
+      margin-top: 8px;
+      overflow: hidden;
+    }
+    .strength-bar {
+      height: 100%;
+      width: 0%;
+      background: var(--error);
+      border-radius: 4px;
+      transition: width 0.3s ease, background 0.3s ease;
+    }
+    .strength-label {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    .toggle-pw {
+      position: absolute;
+      right: 16px; top: 50%;
+      transform: translateY(-50%);
+      background: none; border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: color var(--transition);
+    }
+    .toggle-pw:hover { color: var(--gold); }
+
+    /* Buttons */
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 28px;
+    }
+    .btn {
+      flex: 1;
+      padding: 14px 20px;
+      border-radius: 10px;
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      border: none;
+      transition: transform var(--transition), box-shadow var(--transition), opacity var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-primary {
+      background: var(--gold);
+      color: #080810;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(212,175,55,0.3); }
+    .btn-ghost {
+      background: transparent;
+      border: 1.5px solid var(--border);
+      color: var(--text);
+    }
+    .btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+
+    .signin-link {
+      text-align: center;
+      margin-top: 22px;
+      font-size: 0.86rem;
+      color: var(--text-muted);
+    }
+    .signin-link a { color: var(--gold); font-weight: 600; }
+
+    /* Success screen */
+    #successPanel {
+      display: none;
+      text-align: center;
+      padding: 20px 0;
+    }
+    #successPanel.show { display: block; animation: fadeSlide 0.4s ease; }
+    .success-icon {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: var(--gold-glow);
+      border: 2px solid var(--gold);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 1.8rem;
+      color: var(--gold);
+    }
+    #successPanel h2 {
+      font-family: var(--display);
+      font-size: 1.4rem;
+      margin-bottom: 10px;
+    }
+    #successPanel p { color: var(--text-muted); font-size: 0.9rem; }
+
+    @media (max-width: 480px) {
+      .card { padding: 28px 20px; }
+      .field-row { flex-direction: column; gap: 0; }
+      .gender-group { flex-direction: column; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="wrap">
+    <div class="form-header">
+      <p class="eyebrow">Get Started</p>
+      <h1>Create Your Account</h1>
+      <p>Takes less than a minute</p>
+    </div>
+
+    <div class="card">
+
+      <div class="steps">
+        <div class="step-dot active" id="dot1"></div>
+        <div class="step-dot" id="dot2"></div>
+        <div class="step-dot" id="dot3"></div>
+      </div>
+
+      <form id="signupForm" novalidate>
+
+        <!-- STEP 1: Personal Info -->
+        <div class="step-panel active" id="step1">
+          <div class="field-row">
+            <div class="field-group">
+              <label for="firstname">First Name</label>
+              <div class="input-icon-wrap">
+                <i class="fas fa-user field-icon"></i>
+                <input type="text" id="firstname" maxlength="20" placeholder="John" required />
+              </div>
+              <div class="error-msg" id="err-firstname">First name is required</div>
+            </div>
+            <div class="field-group">
+              <label for="lastname">Last Name</label>
+              <div class="input-icon-wrap">
+                <i class="fas fa-user field-icon"></i>
+                <input type="text" id="lastname" maxlength="20" placeholder="Doe" required />
+              </div>
+              <div class="error-msg" id="err-lastname">Last name is required</div>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="middlename">Middle Name <span style="text-transform:none;color:var(--text-muted);font-weight:400;">(optional)</span></label>
+            <div class="input-icon-wrap">
+              <i class="fas fa-user field-icon"></i>
+              <input type="text" id="middlename" maxlength="20" placeholder="Optional" />
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="course">Course</label>
+            <div class="select-wrap">
+              <select id="course" required>
+                <option value="" disabled selected>Select your course</option>
+                <option value="BCA">BCA — Bachelor of Computer Applications</option>
+                <option value="MBA">MBA — Master of Business Administration</option>
+                <option value="PTA">PTA — Programming &amp; Technical Arts</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="error-msg" id="err-course">Please select a course</div>
+          </div>
+
+          <div class="field-group">
+            <label>Gender</label>
+            <div class="gender-group">
+              <div class="gender-option">
+                <input type="radio" name="gender" id="genderMale" value="Male" />
+                <label for="genderMale"><i class="fas fa-mars"></i> Male</label>
+              </div>
+              <div class="gender-option">
+                <input type="radio" name="gender" id="genderFemale" value="Female" />
+                <label for="genderFemale"><i class="fas fa-venus"></i> Female</label>
+              </div>
+              <div class="gender-option">
+                <input type="radio" name="gender" id="genderOther" value="Other" />
+                <label for="genderOther"><i class="fas fa-genderless"></i> Other</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-primary" onclick="goToStep(2)">
+              Continue <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- STEP 2: Contact Info -->
+        <div class="step-panel" id="step2">
+          <div class="field-group">
+            <label for="phone">Phone Number</label>
+            <div class="phone-row">
+              <div class="field-group" style="margin-bottom:0;">
+                <input type="text" id="countrycode" value="+234" maxlength="4" style="padding-left:16px;text-align:center;" />
+              </div>
+              <div class="field-group" style="margin-bottom:0;">
+                <div class="input-icon-wrap">
+                  <i class="fas fa-phone field-icon"></i>
+                  <input type="tel" id="phone" maxlength="11" placeholder="801 234 5678" required />
+                </div>
+              </div>
+            </div>
+            <div class="error-msg" id="err-phone">Enter a valid phone number</div>
+          </div>
+
+          <div class="field-group">
+            <label for="address">Address</label>
+            <div class="input-icon-wrap">
+              <i class="fas fa-location-dot field-icon" style="top:22px;"></i>
+              <textarea id="address" placeholder="Street, city, state" required></textarea>
+            </div>
+            <div class="error-msg" id="err-address">Address is required</div>
+          </div>
+
+          <div class="field-group">
+            <label for="email">Email Address</label>
+            <div class="input-icon-wrap">
+              <i class="fas fa-envelope field-icon"></i>
+              <input type="email" id="email" placeholder="you@example.com" required />
+            </div>
+            <div class="error-msg" id="err-email">Enter a valid email address</div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-ghost" onclick="goToStep(1)">
+              <i class="fas fa-arrow-left"></i> Back
+            </button>
+            <button type="button" class="btn btn-primary" onclick="goToStep(3)">
+              Continue <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- STEP 3: Security -->
+        <div class="step-panel" id="step3">
+          <div class="field-group">
+            <label for="pass">Password</label>
+            <div class="input-icon-wrap">
+              <i class="fas fa-lock field-icon"></i>
+              <input type="password" id="pass" placeholder="Create a password" required oninput="checkStrength()" />
+              <button type="button" class="toggle-pw" onclick="togglePw('pass', this)"><i class="fas fa-eye"></i></button>
+            </div>
+            <div class="strength-meter"><div class="strength-bar" id="strengthBar"></div></div>
+            <div class="strength-label" id="strengthLabel">Enter a password</div>
+          </div>
+
+          <div class="field-group">
+            <label for="pass2">Re-enter Password</label>
+            <div class="input-icon-wrap">
+              <i class="fas fa-lock field-icon"></i>
+              <input type="password" id="pass2" placeholder="Confirm your password" required />
+              <button type="button" class="toggle-pw" onclick="togglePw('pass2', this)"><i class="fas fa-eye"></i></button>
+            </div>
+            <div class="error-msg" id="err-pass2">Passwords do not match</div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-ghost" onclick="goToStep(2)">
+              <i class="fas fa-arrow-left"></i> Back
+            </button>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-check"></i> Create Account
+            </button>
+          </div>
+        </div>
+
+      </form>
+
+      <!-- Success -->
+      <div id="successPanel">
+        <div class="success-icon"><i class="fas fa-check"></i></div>
+        <h2>Welcome aboard!</h2>
+        <p>Your account has been created successfully.</p>
+      </div>
+
+      <p class="signin-link">Already have an account? <a href="#">Sign in</a></p>
+    </div>
+  </div>
+
+  <script>
+    let currentStep = 1;
+
+    function goToStep(step) {
+      if (step > currentStep && !validateStep(currentStep)) return;
+
+      document.getElementById('step' + currentStep).classList.remove('active');
+      document.getElementById('dot' + currentStep).classList.remove('active');
+      document.getElementById('dot' + currentStep).classList.add('done');
+
+      currentStep = step;
+
+      document.getElementById('step' + currentStep).classList.add('active');
+      document.querySelectorAll('.step-dot').forEach(d => d.classList.remove('active'));
+      document.getElementById('dot' + currentStep).classList.add('active');
+    }
+
+    function showError(id, show) {
+      const input = document.getElementById(id);
+      const err = document.getElementById('err-' + id);
+      if (input) input.classList.toggle('error', show);
+      if (err) err.classList.toggle('show', show);
+    }
+
+    function validateStep(step) {
+      let valid = true;
+
+      if (step === 1) {
+        const fn = document.getElementById('firstname').value.trim();
+        const ln = document.getElementById('lastname').value.trim();
+        const course = document.getElementById('course').value;
+        showError('firstname', !fn); if (!fn) valid = false;
+        showError('lastname', !ln); if (!ln) valid = false;
+        showError('course', !course); if (!course) valid = false;
+      }
+
+      if (step === 2) {
+        const phone = document.getElementById('phone').value.trim();
+        const address = document.getElementById('address').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+        showError('phone', phone.length < 7); if (phone.length < 7) valid = false;
+        showError('address', !address); if (!address) valid = false;
+        showError('email', !emailValid); if (!emailValid) valid = false;
+      }
+
+      return valid;
+    }
+
+    function togglePw(id, btn) {
+      const input = document.getElementById(id);
+      const icon = btn.querySelector('i');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.replace('fa-eye', 'fa-eye-slash');
+      } else {
+        input.type = 'password';
+        icon.classList.replace('fa-eye-slash', 'fa-eye');
+      }
+    }
+
+    function checkStrength() {
+      const val = document.getElementById('pass').value;
+      const bar = document.getElementById('strengthBar');
+      const label = document.getElementById('strengthLabel');
+      let score = 0;
+      if (val.length >= 8) score++;
+      if (/[A-Z]/.test(val)) score++;
+      if (/[0-9]/.test(val)) score++;
+      if (/[^A-Za-z0-9]/.test(val)) score++;
+
+      const levels = [
+        { width: '0%',   color: 'var(--error)',   text: 'Enter a password' },
+        { width: '25%',  color: '#ff6b6b',          text: 'Weak' },
+        { width: '50%',  color: '#fbbf24',          text: 'Fair' },
+        { width: '75%',  color: '#facc15',          text: 'Good' },
+        { width: '100%', color: 'var(--success)',   text: 'Strong' },
+      ];
+      const lvl = levels[val.length === 0 ? 0 : score];
+      bar.style.width = lvl.width;
+      bar.style.background = lvl.color;
+      label.textContent = lvl.text;
+      label.style.color = lvl.color;
+    }
+
+    document.getElementById('signupForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const pass = document.getElementById('pass').value;
+      const pass2 = document.getElementById('pass2').value;
+      let valid = true;
+
+      if (pass.length < 6) {
+        document.getElementById('pass').classList.add('error');
+        valid = false;
+      }
+      const mismatch = pass !== pass2 || pass2.length === 0;
+      showError('pass2', mismatch);
+      if (mismatch) valid = false;
+
+      if (!valid) return;
+
+      // Success
+      document.getElementById('signupForm').style.display = 'none';
+      document.querySelector('.steps').style.display = 'none';
+      document.getElementById('successPanel').classList.add('show');
+    });
+  </script>
+</body>
+</html>
